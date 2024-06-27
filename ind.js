@@ -14,8 +14,8 @@ function generateSignature(clientId, accessSecret, timestamp, method, contentHas
 }
 
 // Параметри автентифікації
-const clientId = 'q77sgudhh3vv7ns7fu7d';
-const accessSecret = '1dae0dd3a7f944bc92403beb2975cfa5';
+const clientId = '';
+const accessSecret = '';
 const timestamp = Date.now().toString();
 const method = 'GET'; // метод запиту
 const contentHash = crypto.createHash('sha256').update('').digest('hex'); // хеш вмісту (може бути пустим, якщо немає тіла запиту)
@@ -46,7 +46,7 @@ axios.get('https://openapi.tuyaeu.com/v1.0/token', {
   const accessToken = response.data.result.access_token;
 
   // Запит на отримання статусу пристрою
-  const deviceId = 'bf8d373dc9544ec090zyiu';
+  const deviceId = '';
   const statusTimestamp = Date.now().toString();
   const statusSignUrl = `/v1.0/devices/${deviceId}`;
   const statusSign = generateSignature(clientId, accessSecret, statusTimestamp, 'GET', contentHash, statusSignUrl);
