@@ -2,9 +2,9 @@ const axios = require('axios');
 const crypto = require('crypto');
 
 // Функція для генерації підпису HMAC-SHA256
-function generateSignature(clientId, accessSecret, timestamp, method, contentHash, signUrl) {
+function generateSignature(clientId, accessSecret, timestamp, method, contentHash, signUrl, nonce) {
   const stringToSign = [method, contentHash, '', signUrl].join('\n');
-  const signStr = clientId + timestamp + stringToSign;
+  const signStr = clientId + timestamp + nonce + stringToSign;
   const sign = crypto.createHmac('sha256', accessSecret)
                      .update(signStr)
                      .digest('hex')
@@ -14,24 +14,26 @@ function generateSignature(clientId, accessSecret, timestamp, method, contentHas
 }
 
 // Параметри автентифікації
-const clientId = '';
-const accessSecret = '';
-const timestamp = Date.now().toString();
+const clientId = 'q77sgudhh3vv7ns7fu7d';
+const accessSecret = '1dae0dd3a7f944bc92403beb2975cfa5';
+const timestamp = Date.now();
 const method = 'GET'; // метод запиту
+const nonce = '';
 const contentHash = crypto.createHash('sha256').update('').digest('hex'); // хеш вмісту (може бути пустим, якщо немає тіла запиту)
 const signUrl = '/v1.0/token?grant_type=1'; // URL-адреса запиту
 
 // Запит на отримання токена доступу
-axios.get('https://openapi.tuyaeu.com/v1.0/token', {
+axios.get('https://openapi.tuyaeu.com/v1.0/token?grant_type=1', {
   params: {
     client_id: clientId,
-    sign: generateSignature(clientId, accessSecret, timestamp, method, contentHash, signUrl),
+    sign: generateSignature(clientId, accessSecret, timestamp, nonce, method, contentHash, signUrl),
     sign_method: 'HMAC-SHA256',
     t: timestamp,
     lang: 'en'
   },
   headers: {
-    sign: generateSignature(clientId, accessSecret, timestamp, method, contentHash, signUrl),
+    client_id: clientId,
+    sign: generateSignature(clientId, accessSecret, timestamp, nonce, method, contentHash, signUrl),
     sign_method: 'HMAC-SHA256',
     t: timestamp,
   }
@@ -46,7 +48,7 @@ axios.get('https://openapi.tuyaeu.com/v1.0/token', {
   const accessToken = response.data.result.access_token;
 
   // Запит на отримання статусу пристрою
-  const deviceId = '';
+  const deviceId = 'bf8d373dc9544ec090zyiu';
   const statusTimestamp = Date.now().toString();
   const statusSignUrl = `/v1.0/devices/${deviceId}`;
   const statusSign = generateSignature(clientId, accessSecret, statusTimestamp, 'GET', contentHash, statusSignUrl);
@@ -87,3 +89,4 @@ axios.get('https://openapi.tuyaeu.com/v1.0/token', {
 .catch(error => {
   console.error('Error:', error.message || error);
 });
+
